@@ -17,6 +17,8 @@ import com.jibruski.productivity_api.dto.AuthDto.LoginRequest;
 import com.jibruski.productivity_api.dto.AuthDto.RegisterRequest;
 import com.jibruski.productivity_api.service.AuthService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -29,13 +31,13 @@ public class AuthController {
     public record AuthRequest(String email, String password) {}
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
         authService.register(req);
         return ResponseEntity.status(201).body(Map.of("message", "Registered"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         AuthResponse tokens = authService.login(req);
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.refreshToken())
