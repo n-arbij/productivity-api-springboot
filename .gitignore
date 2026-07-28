@@ -34,8 +34,11 @@ build/
 
 # env config
 .env
+application.properties
 
 # Maven
 .mvn
 mvnw
 mvnw.cmd
+
+*.pem
