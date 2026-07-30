@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.BusinessRuleException;
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
 import com.jibruski.productivity_api.dto.HabitDto;
 import com.jibruski.productivity_api.dto.HabitLogDto;
 import com.jibruski.productivity_api.model.FrequencyType;
@@ -95,7 +97,7 @@ public class HabitService {
         Habit habit = findOwnedHabit(habitId, userService.getCurrentUserId());
 
         if(habit.getHabitType() == HabitType.QUANTITATIVE && request.value() == null){
-            throw new RuntimeException("Value is required for quantitative habits");
+            throw new BusinessRuleException("Value is required for quantitative habits");
         }
 
         HabitLog log = logRepository.findByHabitIdAndLogDate(habitId, request.logDate())
@@ -266,18 +268,18 @@ public class HabitService {
 
     private void validate(HabitDto.CreateRequest request){
         if(request.habitType() == HabitType.QUANTITATIVE && request.targetValue() == null){
-            throw new RuntimeException("Target Value is required for quantitative habits");
+            throw new BusinessRuleException("Target Value is required for quantitative habits");
         }
         if((request.frequencyType() == FrequencyType.WEEKLY || 
                 request.frequencyType() == FrequencyType.CUSTOM_DAYS && request.customDayMask() == null)
         ){
-            throw new RuntimeException("customDaysMask is required for the weekly habits");
+            throw new BusinessRuleException("customDaysMask is required for the weekly habits");
         }
     }
 
     private Habit findOwnedHabit(Long id, Long userId){
         return habitRepository.findByIdAndUserIdAndDeletedFalse(id, userId).orElseThrow(
-            () -> new RuntimeException("Habit not found")
+            () -> new ResourceNotFoundException("Habit not found")
         );
     }
 

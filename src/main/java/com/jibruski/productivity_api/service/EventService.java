@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.ForbiddenException;
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
 import com.jibruski.productivity_api.common.RecurrenceExpander;
 import com.jibruski.productivity_api.dto.EventDto;
 import com.jibruski.productivity_api.dto.EventDto.OccurrenceResponse;
@@ -212,7 +214,7 @@ public class EventService {
     public void addReminder(Long eventId, int minutes){
         Long userId = userService.getCurrentUserId();
         Event event = eventRepository.findByIdAndUserId(eventId, userId).orElseThrow(
-            () -> new RuntimeException("Event not found with id: " + eventId)
+            () -> new ResourceNotFoundException("Event not found with id: " + eventId)
         );
 
         boolean alreadyExists = reminderRepository.existsByEventAndRemindBeforeMinutes(event, minutes);
@@ -231,7 +233,7 @@ public class EventService {
 
     public void removeReminder(Long id){
         EventReminder reminder = reminderRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("Event Reminder not found")
+            () -> new ResourceNotFoundException("Event Reminder not found")
         );
 
         getEventById(reminder.getEvent().getId());
@@ -249,11 +251,11 @@ public class EventService {
     private Event getEventById(Long id){
         Long userId = userService.getCurrentUserId();
         Event event = eventRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("Event not found")
+            () -> new ResourceNotFoundException("Event not found")
         );
 
         if(!event.getUserId().equals(userId)){
-            throw new RuntimeException("Access denied");
+            throw new ForbiddenException("Access denied");
         }
 
         return event;
