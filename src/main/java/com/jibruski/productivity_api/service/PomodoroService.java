@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.ForbiddenException;
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
 import com.jibruski.productivity_api.dto.PomodoroDto;
 import com.jibruski.productivity_api.model.PomodoroSession;
 import com.jibruski.productivity_api.model.SessionStatus;
@@ -50,11 +52,11 @@ public class PomodoroService {
         Long userId = userService.getCurrentUserId();
 
         PomodoroSession session = pomodoroRepository.findById(sessionId).orElseThrow(
-            () -> new RuntimeException("Session not found")
+            () -> new ResourceNotFoundException("Session not found")
         );
 
         if (!session.getUserId().equals(userId)) {
-            throw new RuntimeException("You do not own this session");
+            throw new ForbiddenException("You do not own this session");
         }
 
         session.setStatus(request.status());

@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.ConflictException;
+import com.jibruski.exceptionstarter.exceptions.UnauthorizedException;
 import com.jibruski.productivity_api.dto.AuthDto.AuthResponse;
 import com.jibruski.productivity_api.dto.AuthDto.LoginRequest;
 import com.jibruski.productivity_api.dto.AuthDto.RegisterRequest;
@@ -25,11 +27,11 @@ public class AuthService {
 
     public void register (RegisterRequest request){
         if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new RuntimeException("Email already registered");
+            throw new ConflictException("Email already registered");
         }
 
         if (userRepository.findByUsername(request.email()).isPresent()) {
-            throw new RuntimeException("Email already registered");
+            throw new ConflictException("Email already registered");
         }
         
         User user = new User();
@@ -41,7 +43,7 @@ public class AuthService {
     public AuthResponse login (LoginRequest request){
         User user = userRepository.findByUsername(request.username()).orElse(null);
         if (user == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid Credentials");
+            throw new UnauthorizedException("Invalid Credentials");
         }
 
         UserPrincipal principal = new UserPrincipal(user.getId().toString(), List.of("USER"));
@@ -54,7 +56,7 @@ public class AuthService {
     public String refreshAccessToken(String refreshToken) {
         Claims claims = jwtService.parseAndValidate(refreshToken);
         if (!jwtService.isRefreshToken(claims)) {
-            throw new RuntimeException("Invalid credentials");
+            throw new UnauthorizedException("Invalid credentials");
         }
         UserPrincipal principal = jwtService.toPrincipal(claims);
         return jwtService.issueAccessToken(principal);

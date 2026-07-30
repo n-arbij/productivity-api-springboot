@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.jibruski.exceptionstarter.exceptions.ResourceNotFoundException;
 import com.jibruski.productivity_api.dto.JournalDto;
 import com.jibruski.productivity_api.model.Journal;
 import com.jibruski.productivity_api.repository.JournalRepository;
@@ -27,7 +28,7 @@ public class JournalService {
     public JournalDto.Response getById(Long id){
         Long userId = userService.getCurrentUserId();
         Journal entry = journalRepository.findByIdAndUserId(id, userId).orElseThrow(
-            () -> new RuntimeException("Entry not found")
+            () -> new ResourceNotFoundException("Entry not found")
         );
         return JournalDto.Response.fromEntity(entry);
     }
@@ -47,7 +48,7 @@ public class JournalService {
     public JournalDto.Response updateJournal(Long id, JournalDto.Request request){
         Long userId = userService.getCurrentUserId();
         Journal entry = journalRepository.findByIdAndUserId(id, userId).orElseThrow(
-            () -> new RuntimeException("Entry not found")
+            () -> new ResourceNotFoundException("Entry not found")
         );
 
         if(request.content() != null) entry.setContent(request.content());
@@ -59,7 +60,7 @@ public class JournalService {
     public JournalDto.Response deleteJournal(Long id){
         Long userId = userService.getCurrentUserId();
         Journal entry = journalRepository.findByIdAndUserId(id, userId).orElseThrow(
-            () -> new RuntimeException("Entry not found")
+            () -> new ResourceNotFoundException("Entry not found")
         );
         entry.setDeleted(true);
         journalRepository.save(entry);
