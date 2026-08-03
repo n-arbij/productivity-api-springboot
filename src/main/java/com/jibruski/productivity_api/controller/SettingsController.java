@@ -3,6 +3,7 @@ package com.jibruski.productivity_api.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jibruski.productivity_api.dto.SettingsDto.PomodoroUpdateRequest;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/settings")
 public class SettingsController {
     private final SettingsService settingsService;
 
