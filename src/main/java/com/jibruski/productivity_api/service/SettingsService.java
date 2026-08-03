@@ -10,6 +10,7 @@ import com.jibruski.productivity_api.model.Settings;
 import com.jibruski.productivity_api.model.User;
 import com.jibruski.productivity_api.repository.SettingsRepository;
 import com.jibruski.productivity_api.repository.UserRepository;
+import com.jibruski.productivity_api.security.CurrentUserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SettingsService {
     private final SettingsRepository settingsRepository;
+    private final CurrentUserService userService;
     private final UserRepository userRepository;
 
     private static final int MIN_MINUTES = 1;
@@ -24,13 +26,15 @@ public class SettingsService {
     private static final int MIN_SESSIONS = 1;
     private static final int MAX_SESSIONS = 10;
 
-    public SettingsResponse getSettings(Long userId) {
+    public SettingsResponse getSettings() {
+        Long userId = userService.getCurrentUserId();
         User user = getUser(userId);
         Settings settings = getOrCreateSettings(userId);
         return toResponse(user, settings);
     }
  
-    public SettingsResponse updateProfile(Long userId, ProfileUpdateRequest request) {
+    public SettingsResponse updateProfile(ProfileUpdateRequest request) {
+        Long userId = userService.getCurrentUserId();
         User user = getUser(userId);
  
         if (request.username() != null && !request.username().isBlank()) {
@@ -45,7 +49,8 @@ public class SettingsService {
         return toResponse(user, settings);
     }
  
-    public SettingsResponse updatePomodoro(Long userId, PomodoroUpdateRequest request) {
+    public SettingsResponse updatePomodoro(PomodoroUpdateRequest request) {
+        Long userId = userService.getCurrentUserId();
         validateMinutes(request.pomodoroFocusMinutes(), "pomodoroFocusMinutes");
         validateMinutes(request.pomodoroShortBreakMinutes(), "pomodoroShortBreakMinutes");
         validateMinutes(request.pomodoroLongBreakMinutes(), "pomodoroLongBreakMinutes");
